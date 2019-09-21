@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    
+    <title>New Year Formula</title>
+    
+    <meta name="description" content="Compute New Year countdown formula.">
+    <meta name="author" content="daniele.olmisani@gmail.com">
+
+</head>
+
+<body>
+    
+    
+    <script>
+
+        const OPERATORS = [ " + ", " - ", " * ", " / ", " ** ", " % ", " & ", " | ", " ^ " ];
+        const STEPS = 8**OPERATORS.length;
+
+        for (let i=0; i<STEPS; i++) {
+
+
+            let e = buildExpr(i)
+            let r = eval(e);
+
+            if (r == 2020) {
+                console.log(r + " = " + e);
+            }
+        }
+
+        console.log("COMPLETED");
+
+
+        function getOperator(i) {
+            return OPERATORS[i % OPERATORS.length];
+        }
+
+        function buildExpr(i) {
+
+            let expr = "9";
+            let v = i;
+
+            for(let n=8; n>=1; n--) {
+                expr += getOperator(v) + n;
+                v = Math.floor(v / OPERATORS.length);
+            }
+
+            return expr;
+        }
+
+    </script>
+
+</body>
+</html>
