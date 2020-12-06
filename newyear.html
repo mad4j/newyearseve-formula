@@ -17,16 +17,15 @@
     
     <script>
 
-        const OPERATORS = [ " + ", " - ", " * ", " / ", " ** ", " % ", " & ", " | ", " ^ " ];
-        const STEPS = 8**OPERATORS.length;
+        const OPERATORS = [ " + ", " - ", " * ", " / ", " ** " ];
+        const STEPS = OPERATORS.length**8;
 
         for (let i=0; i<STEPS; i++) {
-
 
             let e = buildExpr(i)
             let r = eval(e);
 
-            if (r == 2020) {
+            if (r == 2021) {
                 console.log(r + " = " + e);
             }
         }
@@ -47,6 +46,8 @@
                 expr += getOperator(v) + n;
                 v = Math.floor(v / OPERATORS.length);
             }
+
+            //console.log(i + " : " + expr);
 
             return expr;
         }

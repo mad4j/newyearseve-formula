@@ -1,9 +1,9 @@
 # newyearseve-formula
 New Year's Eve countdown formula
 
-# 2020
+# 2021
 
-![2020](2020.png)
+![2021](2021.png)
 
 # 2019
 
