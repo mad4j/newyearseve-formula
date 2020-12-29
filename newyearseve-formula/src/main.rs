@@ -89,7 +89,7 @@ fn main() {
 
     for (p, o) in pos.cartesian_product(ops) {
 
-        for k in o.iter().permutations(FORMULA_OPERATORS) {
+        for k in o.iter().permutations(FORMULA_OPERATORS).unique() {
 
             let s = generate_formula(&p[..], &k[..]);
             let r = evaluate_formula(&s).unwrap_or_default();
