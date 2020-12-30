@@ -14,9 +14,9 @@ fn generate_formula(positions: &[usize], operations: &[&char]) -> String {
     let mut o = 0;
     let mut d = 9;
 
-    let mut buf = String::with_capacity(2 * FORMULA_SIZE);
+    let mut buf = String::with_capacity(FORMULA_SIZE);
 
-    for i in 0..17 {
+    for i in 0..FORMULA_SIZE {
         if i < positions[o] {
             buf.push(char::from_digit(d, 10).unwrap());
             d -= 1;
@@ -34,10 +34,8 @@ fn evaluate_formula(expr: &str) -> Option<f32> {
 
     for token in expr.chars() {
         let result: Option<f32> = if token.is_digit(10) {
-            match token.to_digit(10) {
-                Some(v) => Some(v as f32),
-                None => None,
-            }
+            // convert char to digit and then to float
+            token.to_digit(10).and_then(|x| Some(x as f32))
         } else {
             let op2 = stack.pop()?;
             let op1 = stack.pop()?;
