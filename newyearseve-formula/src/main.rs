@@ -10,7 +10,6 @@ const FORMULA_OPERANDS: usize = 9;
 const FORMULA_OPERATORS: usize = 8;
 const FORMULA_SIZE: usize = FORMULA_OPERANDS + FORMULA_OPERATORS;
 
-
 fn generate_formula(positions: &[usize], operations: &[&char]) -> String {
     let mut o = 0;
     let mut d = 9;
@@ -78,9 +77,7 @@ fn main() {
         .iter()
         .dispositions(FORMULA_OPERATORS);
 
-    
     for (p, o) in pos.cartesian_product(ops) {
-
         let s = generate_formula(&p[..], &o[..]);
         let r = evaluate_formula(&s).unwrap_or_default();
 

@@ -1,8 +1,6 @@
-
-#[path = "unpack.rs"]
-mod unpack;
-use unpack::UnpackIterator;
-
+#[path = "integer_pack.rs"]
+mod integer_pack;
+use integer_pack::unpack;
 
 #[derive(Debug, Clone)]
 pub struct Dispositions<I: Iterator> {
@@ -20,27 +18,32 @@ where
     type Item = Vec<I::Item>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.max_index {
-            let &mut Dispositions {
-                ref elems,
-                ref length,
-                max_index: _,
-                ref mut index,
-            } = self;
+        let &mut Dispositions {
+            ref elems,
+            ref length,
+            ref mut max_index,
+            ref mut index,
+        } = self;
 
+        if index < max_index {
+            // compute next value
+            let result = Some(
+                unpack(*index, elems.len(), *length)
+                    .map(|x| elems[x].clone())
+                    .collect(),
+            );
+
+            // update next value index
             *index += 1;
 
-            Some(
-                UnpackIterator::init(*index, elems.len(), *length)
-                    .map(|x| self.elems[x].clone())
-                    .collect(),
-            )
+            // return result value
+            result
         } else {
+            // iterator end reached
             None
         }
     }
 }
-
 
 pub fn dispositions<I: Iterator>(iter: I, k: usize) -> Dispositions<I> {
     let elems: Vec<I::Item> = iter.collect();
