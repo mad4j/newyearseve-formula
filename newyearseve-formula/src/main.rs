@@ -1,14 +1,17 @@
 //https://www.dcode.fr/reverse-polish-notation
 
+mod dispositions;
+
+use crate::dispositions::*;
 use itertools::Itertools;
 use std::char;
+use std::time::{Duration, Instant};
 
-mod dispositions;
-use crate::dispositions::*;
+const FORMULA_NUM_OPERANDS: usize = 9;
+const FORMULA_NUM_OPERATORS: usize = 8;
+const FORMULA_SIZE: usize = FORMULA_NUM_OPERANDS + FORMULA_NUM_OPERATORS;
 
-const FORMULA_OPERANDS: usize = 9;
-const FORMULA_OPERATORS: usize = 8;
-const FORMULA_SIZE: usize = FORMULA_OPERANDS + FORMULA_OPERATORS;
+const FORMULA_OPERATORS: [char; 5] = ['+', '-', '*', '/', '^'];
 
 fn generate_formula(positions: &[usize], operations: &[&char]) -> String {
     let mut o = 0;
@@ -30,10 +33,10 @@ fn generate_formula(positions: &[usize], operations: &[&char]) -> String {
 }
 
 fn evaluate_formula(expr: &str) -> Option<f32> {
-    let mut stack: Vec<f32> = Vec::new();
+    let mut stack: Vec<f32> = Vec::with_capacity(FORMULA_NUM_OPERANDS);
 
     for token in expr.chars() {
-        let result: Option<f32> = if token.is_digit(10) {
+        let result = if token.is_digit(10) {
             // convert char to digit and then to float
             token.to_digit(10).and_then(|x| Some(x as f32))
         } else {
@@ -65,15 +68,15 @@ fn main() {
     // need to be p[i] >= 2*(i+1) otherwise there will not enough
     // operands
 
+    let start = Instant::now();
+
     // generate all valid operator's positions
     let pos = (0..FORMULA_SIZE)
-        .combinations(FORMULA_OPERATORS)
+        .combinations(FORMULA_NUM_OPERATORS)
         .filter(|x| x.iter().enumerate().all(|(i, v)| *v >= 2 * (i + 1)));
 
     // generate all possible operators dispositions
-    let ops = ['+', '-', '*', '/', '^']
-        .iter()
-        .dispositions(FORMULA_OPERATORS);
+    let ops = FORMULA_OPERATORS.iter().dispositions(FORMULA_NUM_OPERATORS);
 
     for (p, o) in pos.cartesian_product(ops) {
         let s = generate_formula(&p[..], &o[..]);
@@ -84,13 +87,5 @@ fn main() {
         }
     }
 
-    // "98+7+6+5+432--1--" -> -29.0
-
-    //println!("{:?}", evaluate_formula("98+"));
-    //println!("{:?}", evaluate_formula("98+7+"));
-    //println!("{:?}", evaluate_formula("98+7+6+"));
-    //println!("{:?}", evaluate_formula("98+7+6+5+"));
-    //println!("{:?}", evaluate_formula("98+7+6+5+432--1--"));
-
-    //println!("{:?}", evaluate_formula("98*765^4/++3-2+1-"));
+    println!("Time elapsed is {:?}", start.elapsed());
 }
