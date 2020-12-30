@@ -5,7 +5,7 @@ mod dispositions;
 use crate::dispositions::*;
 use itertools::Itertools;
 use std::char;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 const FORMULA_NUM_OPERANDS: usize = 9;
 const FORMULA_NUM_OPERATORS: usize = 8;
