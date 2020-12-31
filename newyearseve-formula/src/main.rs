@@ -32,7 +32,7 @@ fn main() {
         let r = f.evaluate().unwrap_or_default();
 
         if r == 2021 {
-            println!("{} -> {:?}", f, r);
+            println!("{} -> {}", f, r);
         }
 
         count += 1;
