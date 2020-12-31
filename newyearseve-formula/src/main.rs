@@ -5,8 +5,11 @@ mod formula;
 
 use crate::dispositions::*;
 use crate::formula::*;
+
 use itertools::Itertools;
 use std::time::Instant;
+
+//use rayon::prelude::*;
 
 fn main() {
     // formula string is 17 chars long (9 digits and 8 operators)
@@ -27,19 +30,17 @@ fn main() {
         .iter()
         .dispositions(FORMULA_NUM_OPERATORS as usize);
 
-    for (p, o) in pos.cartesian_product(ops) {
-        let f = Formula::new(p, o);
-        let r = f.evaluate().unwrap_or_default();
-
-        if r == 2021 {
-            println!("{} -> {}", f, r);
-        }
-
-        count += 1;
-    }
+    // looking for formula that compute a specific value
+    pos.cartesian_product(ops)
+        .map(|(p, o)| {
+            count += 1;
+            Formula::new(p, o)
+        })
+        .filter(|f| f.evaluate().unwrap_or_default() == 2021)
+        .for_each(|f| println!("{}", f));
 
     println!(
-        "{} iterations in {:?} @{}itms",
+        "{} iterations in {:?} @{}ipms",
         count,
         start.elapsed(),
         count / start.elapsed().as_millis()
