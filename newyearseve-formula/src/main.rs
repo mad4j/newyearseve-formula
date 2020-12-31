@@ -31,7 +31,7 @@ fn main() {
         let f = Formula::new(p, o);
         let r = f.evaluate().unwrap_or_default();
 
-        if r == 2020 {
+        if r == 2021 {
             println!("{} -> {:?}", f, r);
         }
 
