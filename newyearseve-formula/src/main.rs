@@ -32,13 +32,13 @@ fn generate_formula(positions: &[usize], operations: &[&char]) -> String {
     buf
 }
 
-fn evaluate_formula(expr: &str) -> Option<f32> {
-    let mut stack: Vec<f32> = Vec::with_capacity(FORMULA_NUM_OPERANDS);
+fn evaluate_formula(expr: &str) -> Option<u32> {
+    let mut stack: Vec<u32> = Vec::with_capacity(FORMULA_NUM_OPERANDS);
 
     for token in expr.chars() {
         let result = if token.is_digit(10) {
             // convert char to digit and then to float
-            token.to_digit(10).and_then(|x| Some(x as f32))
+            token.to_digit(10)
         } else {
             let op2 = stack.pop()?;
             let op1 = stack.pop()?;
@@ -47,15 +47,21 @@ fn evaluate_formula(expr: &str) -> Option<f32> {
                 '+' => Some(op1 + op2),
                 '-' => Some(op1 - op2),
                 '*' => Some(op1 * op2),
-                '/' => Some(op1 / op2),
-                '^' => Some(op1.powf(op2)),
+                '/' => {
+                    if op2 != 0 && op1 % op2 == 0 {
+                        Some(op1 / op2)
+                    } else {
+                        None
+                    }
+                }
+                '^' => Some(op1.pow(op2)),
                 _ => None,
             }
         };
 
         match result {
             Some(v) => stack.push(v),
-            None => (),
+            None => return None,
         };
     }
 
@@ -82,7 +88,7 @@ fn main() {
         let s = generate_formula(&p[..], &o[..]);
         let r = evaluate_formula(&s).unwrap_or_default();
 
-        if r == 2021f32 {
+        if r == 2021 {
             println!("{:?} -> {:?}", s, r);
         }
     }
