@@ -45,6 +45,16 @@ where
     }
 }
 
+impl<I> ExactSizeIterator for Dispositions<I>
+where
+    I: Iterator,
+    I::Item: Clone,
+{
+    fn len(&self) -> usize {
+        self.max_index
+    }
+}
+
 pub fn dispositions<I: Iterator>(iter: I, k: usize) -> Dispositions<I> {
     let elems: Vec<I::Item> = iter.collect();
     let max_index: usize = if k == 0 { 0 } else { elems.len().pow(k as u32) };
