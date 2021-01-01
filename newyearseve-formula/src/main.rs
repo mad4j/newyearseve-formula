@@ -28,6 +28,7 @@ fn main() {
     // generate all possible operators dispositions
     let ops = FORMULA_OPERATORS
         .iter()
+        .cloned()
         .dispositions(FORMULA_NUM_OPERATORS as usize);
 
     // looking for formula that compute a specific value

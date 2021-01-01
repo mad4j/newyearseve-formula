@@ -8,13 +8,13 @@ pub const FORMULA_SIZE: u8 = FORMULA_NUM_OPERANDS + FORMULA_NUM_OPERATORS;
 pub const FORMULA_OPERATORS: [char; 5] = ['+', '-', '*', '/', '^'];
 
 #[derive(Debug)]
-pub struct Formula<'a> {
+pub struct Formula {
     pub positions: Vec<u8>,
-    pub operators: Vec<&'a char>,
+    pub operators: Vec<char>,
 }
 
-impl<'a> Formula<'_> {
-    pub fn new(p: Vec<u8>, o: Vec<&'a char>) -> Formula<'a> {
+impl Formula {
+    pub fn new(p: Vec<u8>, o: Vec<char>) -> Formula {
         Formula {
             positions: p,
             operators: o,
@@ -70,8 +70,8 @@ impl<'a> Formula<'_> {
     }
 }
 
-impl<'a> fmt::Display for Formula<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl fmt::Display for Formula {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let Formula {
             ref positions,
             ref operators,
@@ -87,7 +87,7 @@ impl<'a> fmt::Display for Formula<'_> {
                 buf.push(char::from_digit(d, 10).unwrap());
                 d -= 1;
             } else {
-                buf.push(*operators[o]);
+                buf.push(operators[o]);
                 o += 1;
             }
         }
