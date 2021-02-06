@@ -21,13 +21,13 @@ impl Formula {
         }
     }
 
-    pub fn evaluate(&self) -> Option<u32> {
+    pub fn evaluate(&self) -> Option<i64> {
         let Formula {
             ref positions,
             ref operators,
         } = self;
 
-        let mut stack: Vec<u32> = Vec::with_capacity(FORMULA_NUM_OPERANDS as usize);
+        let mut stack: Vec<i64> = Vec::with_capacity(FORMULA_NUM_OPERANDS as usize);
 
         let mut o = 0;
         let mut d = 9;
@@ -40,17 +40,11 @@ impl Formula {
                 let op2 = stack.pop()?;
                 let op1 = stack.pop()?;
                 let result = match operators[o] {
-                    '+' => Some(op1 + op2),
-                    '-' => Some(op1 - op2),
-                    '*' => Some(op1 * op2),
-                    '/' => {
-                        if op2 != 0 && op1 % op2 == 0 {
-                            Some(op1 / op2)
-                        } else {
-                            None
-                        }
-                    }
-                    '^' => Some(op1.pow(op2)),
+                    '+' => op1.checked_add(op2),
+                    '-' => op1.checked_sub(op2),
+                    '*' => op1.checked_mul(op2),
+                    '/' => op1.checked_div(op2), 
+                    '^' => op1.checked_pow(op2 as u32),
                     _ => None,
                 };
 
