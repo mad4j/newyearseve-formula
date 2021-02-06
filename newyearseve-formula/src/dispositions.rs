@@ -6,7 +6,8 @@ use integer_pack::unpack;
 pub struct Dispositions<I: Iterator> {
     elems: Vec<I::Item>,
     length: usize,
-    max_index: usize,
+    first_index: usize,
+    last_index: usize,
     index: usize,
 }
 
@@ -21,11 +22,12 @@ where
         let &mut Dispositions {
             ref elems,
             ref length,
-            ref mut max_index,
+            first_index: _,
+            ref mut last_index,
             ref mut index,
         } = self;
 
-        if index < max_index {
+        if index < last_index {
             // compute next value
             let result = Some(
                 unpack(*index, elems.len(), *length)
@@ -51,19 +53,38 @@ where
     I::Item: Clone,
 {
     fn len(&self) -> usize {
-        self.max_index
+        self.last_index - self.first_index
     }
 }
 
 pub fn dispositions<I: Iterator>(iter: I, k: usize) -> Dispositions<I> {
     let elems: Vec<I::Item> = iter.collect();
-    let max_index: usize = if k == 0 { 0 } else { elems.len().pow(k as u32) };
+    let last_index: usize = if k == 0 { 0 } else { elems.len().pow(k as u32) };
 
     Dispositions {
         elems,
         length: k,
-        max_index,
+        first_index: 0,
+        last_index,
         index: 0,
+    }
+}
+
+pub fn dispositions_part<I: Iterator>(iter: I, k: usize, part: u8, parts: u8) -> Dispositions<I> {
+    let elems: Vec<I::Item> = iter.collect();
+    let max_index: usize = if k == 0 { 0 } else { elems.len().pow(k as u32) };
+
+    let part_size: f32 = max_index as f32 / parts as f32;
+
+    let first_index = (part as f32 * part_size) as usize;
+    let last_index = ((part+1) as f32 * part_size) as usize;
+
+    Dispositions {
+        elems,
+        length: k,
+        first_index,
+        last_index ,
+        index: first_index,
     }
 }
 

@@ -9,8 +9,6 @@ use crate::formula::*;
 use itertools::Itertools;
 use std::time::Instant;
 
-//use rayon::prelude::*;
-
 fn main() {
     // formula string is 17 chars long (9 digits and 8 operators)
     // considering only binary operators then operator position
@@ -32,14 +30,20 @@ fn main() {
         .dispositions(FORMULA_NUM_OPERATORS as usize);
 
     // looking for formula that compute a specific value
-    pos.cartesian_product(ops)
+    let results: Vec<_> = pos.cartesian_product(ops)
         .map(|(p, o)| {
             count += 1;
             Formula::new(p, o)
         })
         .filter(|f| f.evaluate().unwrap_or_default() == 2021)
-        .for_each(|f| println!("{}", f));
+        .collect();
+    
+    // display results
+    for r in results {
+        println!("{}", r);
+    } 
 
+    // display duration
     println!(
         "{} iterations in {:?} @{}ipms",
         count,

@@ -43,7 +43,7 @@ impl Formula {
                     '+' => op1.checked_add(op2),
                     '-' => op1.checked_sub(op2),
                     '*' => op1.checked_mul(op2),
-                    '/' => op1.checked_div(op2), 
+                    '/' => op1.checked_div(op2),
                     '^' => op1.checked_pow(op2 as u32),
                     _ => None,
                 };
