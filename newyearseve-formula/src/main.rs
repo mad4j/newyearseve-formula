@@ -6,24 +6,22 @@ mod formula;
 use crate::dispositions::*;
 use crate::formula::*;
 
+use indicatif::HumanDuration;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
-use indicatif::HumanDuration;
 
 use itertools::Itertools;
 use std::time::Instant;
 
-
 const MAX_ITERATIONS: u64 = 558_593_750;
+const MAX_PARTS: u8 = 4;
 
 fn main() {
-    // formula string is 17 chars long (9 digits and 8 operators)
-    // considering only binary operators then operator position
-    // need to be p[i] >= 2*(i+1) otherwise there will not enough
-    // operands
 
+    // start timer
     let started = Instant::now();
 
+    // progress bar setup
     let progress_bar = ProgressBar::new(MAX_ITERATIONS);
     progress_bar.set_draw_delta(10_000);
     progress_bar.set_style(
@@ -35,7 +33,7 @@ fn main() {
     // generate all valid operator's positions
     let pos = (0..FORMULA_SIZE)
         .combinations(FORMULA_NUM_OPERATORS as usize)
-        .filter(|x| x.iter().enumerate().all(|(i, v)| *v >= 2 * (i + 1) as u8));
+        .filter(|x| Formula::is_valid(x));
 
     // generate all possible operators dispositions
     let ops = FORMULA_OPERATORS
@@ -51,18 +49,18 @@ fn main() {
         .filter(|f| f.evaluate() == Some(2021))
         .collect();
 
+    // dispose progress bar
     progress_bar.finish();
 
     // display results
-    for r in results {
+    for r in &results {
         println!("{}", r);
     }
 
     // display duration
     println!(
-        "{} iterations in {:?} @{}ipms",
-        MAX_ITERATIONS,
-        //started.elapsed(),
+        "found {} solutions in {} @{} it per millis",
+        results.len(),
         HumanDuration(started.elapsed()),
         MAX_ITERATIONS / started.elapsed().as_millis() as u64
     );

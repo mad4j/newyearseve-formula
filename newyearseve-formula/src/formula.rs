@@ -21,6 +21,14 @@ impl Formula {
         }
     }
 
+    // formula string is 17 chars long (9 digits and 8 operators)
+    // considering only binary operators then operator position
+    // need to be p[i] >= 2*(i+1) otherwise there will not enough
+    // operands
+    pub fn is_valid(v: &Vec<u8>) -> bool {
+        v.iter().enumerate().all(|(i, v)| *v >= 2 * (i + 1) as u8)
+    }
+
     pub fn evaluate(&self) -> Option<i64> {
         let Formula {
             ref positions,

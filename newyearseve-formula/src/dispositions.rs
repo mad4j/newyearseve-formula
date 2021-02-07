@@ -58,16 +58,7 @@ where
 }
 
 pub fn dispositions<I: Iterator>(iter: I, k: usize) -> Dispositions<I> {
-    let elems: Vec<I::Item> = iter.collect();
-    let last_index: usize = if k == 0 { 0 } else { elems.len().pow(k as u32) };
-
-    Dispositions {
-        elems,
-        length: k,
-        first_index: 0,
-        last_index,
-        index: 0,
-    }
+    dispositions_part(iter, k, 0, 1)
 }
 
 pub fn dispositions_part<I: Iterator>(iter: I, k: usize, part: u8, parts: u8) -> Dispositions<I> {
