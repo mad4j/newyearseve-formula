@@ -3,15 +3,16 @@
 mod dispositions;
 mod formula;
 
-use indicatif::HumanDuration;
 use crate::dispositions::*;
 use crate::formula::*;
+
+use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
+use indicatif::HumanDuration;
 
 use itertools::Itertools;
 use std::time::Instant;
 
-use indicatif::ProgressBar;
 
 const MAX_ITERATIONS: u64 = 558_593_750;
 
@@ -23,12 +24,12 @@ fn main() {
 
     let start = Instant::now();
 
-    let bar = ProgressBar::new(MAX_ITERATIONS);
-    bar.set_draw_delta(10_000);
-    bar.set_style(
+    let progress_bar = ProgressBar::new(MAX_ITERATIONS);
+    progress_bar.set_draw_delta(10_000);
+    progress_bar.set_style(
         ProgressStyle::default_bar()
             .template("[{elapsed_precise}] {bar:40.cyan/blue} {percent:>3}% ({eta}) {msg}")
-            .progress_chars("##-"),
+            .progress_chars("#--"),
     );
 
     // generate all valid operator's positions
@@ -45,13 +46,12 @@ fn main() {
     // looking for formula that compute a specific value
     let results: Vec<_> = pos
         .cartesian_product(ops)
-        .inspect(|_| bar.inc(1))
+        .inspect(|_| progress_bar.inc(1))
         .map(|(p, o)| Formula::new(p, o))
-        .filter_map(|f| f.evaluate())
-        .filter(|x| *x == 2021)
+        .filter(|f| f.evaluate() == Some(2021))
         .collect();
 
-    bar.finish();
+    progress_bar.finish();
 
     // display results
     for r in results {
