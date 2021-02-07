@@ -22,7 +22,7 @@ fn main() {
     // need to be p[i] >= 2*(i+1) otherwise there will not enough
     // operands
 
-    let start = Instant::now();
+    let started = Instant::now();
 
     let progress_bar = ProgressBar::new(MAX_ITERATIONS);
     progress_bar.set_draw_delta(10_000);
@@ -62,8 +62,8 @@ fn main() {
     println!(
         "{} iterations in {:?} @{}ipms",
         MAX_ITERATIONS,
-        //start.elapsed(),
-        HumanDuration(start.elapsed()),
-        MAX_ITERATIONS / start.elapsed().as_millis() as u64
+        //started.elapsed(),
+        HumanDuration(started.elapsed()),
+        MAX_ITERATIONS / started.elapsed().as_millis() as u64
     );
 }
