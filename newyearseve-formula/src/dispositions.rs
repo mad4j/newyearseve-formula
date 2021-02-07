@@ -77,13 +77,13 @@ pub fn dispositions_part<I: Iterator>(iter: I, k: usize, part: u8, parts: u8) ->
     let part_size: f32 = max_index as f32 / parts as f32;
 
     let first_index = (part as f32 * part_size) as usize;
-    let last_index = ((part+1) as f32 * part_size) as usize;
+    let last_index = ((part + 1) as f32 * part_size) as usize;
 
     Dispositions {
         elems,
         length: k,
         first_index,
-        last_index ,
+        last_index,
         index: first_index,
     }
 }
