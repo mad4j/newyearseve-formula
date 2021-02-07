@@ -11,15 +11,42 @@ use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
 
 use itertools::Itertools;
+use std::thread;
 use std::time::Instant;
 
 const MAX_ITERATIONS: u64 = 558_593_750;
-const MAX_PARTS: u8 = 4;
+const MAX_PARTS: usize = 4;
+
+fn compute(
+    target: i64,
+    part: usize,
+    parts: usize, /*, progress_bar: &ProgressBar */
+) -> Vec<Formula> {
+    // generate all valid operator's positions
+    let pos = (0..FORMULA_SIZE)
+        .combinations(FORMULA_NUM_OPERATORS as usize)
+        .filter(|x| Formula::is_valid(x));
+
+    // generate all possible operators dispositions
+    let ops = FORMULA_OPERATORS.iter().cloned().dispositions_part(
+        FORMULA_NUM_OPERATORS as usize,
+        part as u8,
+        parts as u8,
+    );
+
+    // looking for formula that compute a specific value
+    let result: Vec<Formula> = pos
+        .cartesian_product(ops)
+        //.inspect(|_| progress_bar.inc(1))
+        .map(|(p, o)| Formula::new(p, o))
+        .filter(|f| f.evaluate() == Some(target))
+        .collect();
+
+    // return result
+    result
+}
 
 fn main() {
-
-    // start timer
-    let started = Instant::now();
 
     // progress bar setup
     let progress_bar = ProgressBar::new(MAX_ITERATIONS);
@@ -30,24 +57,43 @@ fn main() {
             .progress_chars("#--"),
     );
 
-    // generate all valid operator's positions
-    let pos = (0..FORMULA_SIZE)
-        .combinations(FORMULA_NUM_OPERATORS as usize)
-        .filter(|x| Formula::is_valid(x));
+    let mut results = Vec::<Formula>::new();
+    let mut handles = vec![];
 
-    // generate all possible operators dispositions
-    let ops = FORMULA_OPERATORS
-        .iter()
-        .cloned()
-        .dispositions(FORMULA_NUM_OPERATORS as usize);
+    // start timer
+    let started = Instant::now();
 
-    // looking for formula that compute a specific value
-    let results: Vec<_> = pos
-        .cartesian_product(ops)
-        .inspect(|_| progress_bar.inc(1))
-        .map(|(p, o)| Formula::new(p, o))
-        .filter(|f| f.evaluate() == Some(2021))
-        .collect();
+    for i in 0..MAX_PARTS {
+        let handle = thread::spawn(move || compute(2021, i, MAX_PARTS));
+        handles.push(handle);
+    }
+
+    for h in handles {
+        let mut r = h.join().unwrap();
+        results.append(&mut r);
+    }
+    /*
+        // generate all valid operator's positions
+        let pos = (0..FORMULA_SIZE)
+            .combinations(FORMULA_NUM_OPERATORS as usize)
+            .filter(|x| Formula::is_valid(x));
+
+        // generate all possible operators dispositions
+        let ops = FORMULA_OPERATORS
+            .iter()
+            .cloned()
+            .dispositions(FORMULA_NUM_OPERATORS as usize);
+
+        // looking for formula that compute a specific value
+        let results: Vec<_> = pos
+            .cartesian_product(ops)
+            .inspect(|_| progress_bar.inc(1))
+            .map(|(p, o)| Formula::new(p, o))
+            .filter(|f| f.evaluate() == Some(2021))
+            .collect();
+    */
+
+    let duration = started.elapsed();
 
     // dispose progress bar
     progress_bar.finish();
@@ -61,7 +107,7 @@ fn main() {
     println!(
         "found {} solutions in {} @{} it per millis",
         results.len(),
-        HumanDuration(started.elapsed()),
-        MAX_ITERATIONS / started.elapsed().as_millis() as u64
+        HumanDuration(duration),
+        MAX_ITERATIONS / duration.as_millis() as u64
     );
 }
