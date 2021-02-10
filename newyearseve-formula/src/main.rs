@@ -1,67 +1,115 @@
 //https://www.dcode.fr/reverse-polish-notation
 
+mod algorithm;
 mod dispositions;
 mod formula;
 
-use crate::dispositions::*;
-use crate::formula::*;
+use crate::algorithm::{compute, MAX_ITERATIONS};
+use crate::formula::Formula;
 
-use indicatif::HumanDuration;
-use indicatif::ProgressBar;
-use indicatif::ProgressStyle;
+use structopt::StructOpt;
 
-use itertools::Itertools;
+use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressStyle};
+
+use colored::Colorize;
+use std::thread;
 use std::time::Instant;
 
-const MAX_ITERATIONS: u64 = 558_593_750;
-const MAX_PARTS: u8 = 4;
+#[derive(Debug, StructOpt)]
+#[structopt(
+    name = "newyearseve",
+    about = "looking for a New Year's Eve count down formula"
+)]
+struct Opt {
+    /// number of parallel cores
+    #[structopt(short, long, default_value = "1")]
+    cores: usize,
+
+    /// target year
+    #[structopt(short, long)]
+    target: i64,
+
+    /// output detailed results
+    #[structopt(short, long)]
+    report: bool,
+}
 
 fn main() {
+    // parse command-line parameters
+    let opt = Opt::from_args();
+
+    // display applicationn header
+    println!();
+    println!("{}", "New Year's Eve countdown formula".green().bold());
+    println!();
+    println!("target : {}", opt.target.to_string().yellow());
+    println!("cores  : {}", opt.cores.to_string().yellow());
+    println!("report : {}", opt.report.to_string().yellow());
+    println!();
+
+    // progress bar container setup
+    let multi_bar = MultiProgress::new();
+    let bar_style = ProgressStyle::default_bar()
+        .template("[{elapsed_precise}] {bar:40.cyan/blue} {percent:>3}% ({eta}) {msg}")
+        .progress_chars("#--");
 
     // start timer
     let started = Instant::now();
 
-    // progress bar setup
-    let progress_bar = ProgressBar::new(MAX_ITERATIONS);
-    progress_bar.set_draw_delta(10_000);
-    progress_bar.set_style(
-        ProgressStyle::default_bar()
-            .template("[{elapsed_precise}] {bar:40.cyan/blue} {percent:>3}% ({eta}) {msg}")
-            .progress_chars("#--"),
-    );
+    let mut results = Vec::<Formula>::new();
+    let mut handles = vec![];
 
-    // generate all valid operator's positions
-    let pos = (0..FORMULA_SIZE)
-        .combinations(FORMULA_NUM_OPERATORS as usize)
-        .filter(|x| Formula::is_valid(x));
+    let iterations = MAX_ITERATIONS / opt.cores as u64;
+    let target = opt.target;
+    let cores = opt.cores;
 
-    // generate all possible operators dispositions
-    let ops = FORMULA_OPERATORS
-        .iter()
-        .cloned()
-        .dispositions(FORMULA_NUM_OPERATORS as usize);
+    // initialize and start computeation cores
+    for i in 0..cores {
+        //build a new progress bar
+        let pb = multi_bar.add(ProgressBar::new(iterations));
+        pb.set_draw_delta(iterations / 100);
+        pb.set_style(bar_style.clone());
 
-    // looking for formula that compute a specific value
-    let results: Vec<_> = pos
-        .cartesian_product(ops)
-        .inspect(|_| progress_bar.inc(1))
-        .map(|(p, o)| Formula::new(p, o))
-        .filter(|f| f.evaluate() == Some(2021))
-        .collect();
+        // start requested cores
+        let handle = thread::spawn(move || {
+            // compute domain search
+            let result = compute(target, i, cores, &pb);
 
-    // dispose progress bar
-    progress_bar.finish();
+            // return result
+            result
+        });
+
+        // store thread handle to retrieve results later
+        handles.push(handle);
+    }
+
+    // waits for all progress bars to report that they are finished.
+    multi_bar.join().unwrap();
+
+    // collect results
+    for h in handles {
+        let mut r = h.join().unwrap();
+        results.append(&mut r);
+    }
+
+    // stop duration timer
+    let duration = started.elapsed();
 
     // display results
-    for r in &results {
-        println!("{}", r);
+    if opt.report {
+        for i in 0..results.len() {
+            println!("{} : {}", i+1, results[i]);
+        }
     }
 
     // display duration
+    println!();
     println!(
-        "found {} solutions in {} @{} it per millis",
-        results.len(),
-        HumanDuration(started.elapsed()),
-        MAX_ITERATIONS / started.elapsed().as_millis() as u64
+        "Found {} solutions in {} @{} iter per millis",
+        results.len().to_string().yellow().bold(),
+        HumanDuration(duration).to_string().green(),
+        (MAX_ITERATIONS / duration.as_millis() as u64)
+            .to_string()
+            .green()
     );
 }

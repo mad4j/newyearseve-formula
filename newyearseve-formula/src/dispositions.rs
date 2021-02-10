@@ -81,10 +81,14 @@ pub fn dispositions_part<I: Iterator>(iter: I, k: usize, part: u8, parts: u8) ->
 
 pub trait DispositionsTrait: Sized + Iterator {
     fn dispositions(self, k: usize) -> Dispositions<Self>;
+    fn dispositions_part(self, k: usize, part: u8, parts: u8) -> Dispositions<Self>;
 }
 
 impl<I: Iterator> DispositionsTrait for I {
     fn dispositions(self, k: usize) -> Dispositions<Self> {
         dispositions(self, k)
+    }
+    fn dispositions_part(self, k: usize, part: u8, parts: u8) -> Dispositions<Self> {
+        dispositions_part(self, k, part, parts)
     }
 }
