@@ -3,6 +3,7 @@
 mod algorithm;
 mod dispositions;
 mod formula;
+mod integer_pack;
 
 use crate::algorithm::{compute, MAX_ITERATIONS};
 use crate::formula::Formula;
@@ -95,14 +96,14 @@ fn main() {
     // stop duration timer
     let duration = started.elapsed();
 
-    // display results
+    // display detailed results
     if opt.report {
         for i in 0..results.len() {
             println!("{} : {}", i+1, results[i]);
         }
     }
 
-    // display duration
+    // display summary results (i.e. duration and speeds)
     println!();
     println!(
         "Found {} solutions in {} @{} iter per millis",
