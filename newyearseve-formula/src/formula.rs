@@ -82,7 +82,7 @@ impl fmt::Display for Formula {
         let mut o = 0;
         let mut d = 9;
 
-        let mut buf = String::with_capacity(2*FORMULA_SIZE as usize);
+        let mut buf = String::with_capacity(2 * FORMULA_SIZE as usize);
 
         for i in 0..FORMULA_SIZE {
             if i < positions[o] {

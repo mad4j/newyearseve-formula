@@ -1,4 +1,3 @@
-
 use crate::integer_pack::unpack;
 
 #[derive(Debug, Clone)]

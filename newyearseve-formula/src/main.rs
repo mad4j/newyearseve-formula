@@ -99,7 +99,7 @@ fn main() {
     // display detailed results
     if opt.report {
         for i in 0..results.len() {
-            println!("{} : {}", i+1, results[i]);
+            println!("{} : {}", i + 1, results[i]);
         }
     }
 

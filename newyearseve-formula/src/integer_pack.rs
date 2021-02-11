@@ -10,7 +10,7 @@ pub struct IntegerPack {
     index: usize,
 }
 
-/// Extract integer values packed in a single integer
+/// Extract integer values packed in a single number
 pub fn unpack(value: usize, modulo: usize, length: usize) -> IntegerPack {
     // intialize a new structure
     IntegerPack {
@@ -46,5 +46,34 @@ impl Iterator for IntegerPack {
             // end reached
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn inter_pack_test_01() {
+        let mut ip = unpack(0b11_00_01_10_11_00, 4, 6);
+        assert_eq!(ip.next(), Some(0));
+        assert_eq!(ip.next(), Some(3));
+        assert_eq!(ip.next(), Some(2));
+        assert_eq!(ip.next(), Some(1));
+        assert_eq!(ip.next(), Some(0));
+        assert_eq!(ip.next(), Some(3));
+        assert_eq!(ip.next(), None);
+    }
+
+    #[test]
+    fn inter_pack_test_02() {
+        let mut ip = unpack(1 + 2*3 +0*9 + 2*27 + 1*81, 3, 6);
+        assert_eq!(ip.next(), Some(1));
+        assert_eq!(ip.next(), Some(2));
+        assert_eq!(ip.next(), Some(0));
+        assert_eq!(ip.next(), Some(2));
+        assert_eq!(ip.next(), Some(1));
+        assert_eq!(ip.next(), Some(0));
+        assert_eq!(ip.next(), None);
     }
 }
