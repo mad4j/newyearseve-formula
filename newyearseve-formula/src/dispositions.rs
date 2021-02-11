@@ -1,6 +1,5 @@
-#[path = "integer_pack.rs"]
-mod integer_pack;
-use integer_pack::unpack;
+
+use crate::integer_pack::unpack;
 
 #[derive(Debug, Clone)]
 pub struct Dispositions<I: Iterator> {
