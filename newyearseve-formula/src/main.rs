@@ -4,6 +4,7 @@ mod algorithm;
 mod dispositions;
 mod formula;
 mod integer_pack;
+mod postfix_to_infix;
 
 use crate::algorithm::{compute, MAX_ITERATIONS};
 use crate::formula::Formula;
@@ -96,9 +97,15 @@ fn main() {
     // stop duration timer
     let duration = started.elapsed();
 
+    let mut results: Vec<String> = results.iter().map(|x| x.to_infix()).collect();
+    results.sort_by_key(|x| x.len());
+    results.dedup();
+    results.reverse();
+
     // display detailed results
     if opt.report {
         for i in 0..results.len() {
+            //println!("{} : {} -> {}", i + 1, results[i], results[i].to_infix());
             println!("{} : {}", i + 1, results[i]);
         }
     }

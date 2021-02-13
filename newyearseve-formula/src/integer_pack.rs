@@ -54,7 +54,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn inter_pack_test_01() {
+    fn integer_pack_test_01() {
         let mut ip = unpack(0b11_00_01_10_11_00, 4, 6);
         assert_eq!(ip.next(), Some(0));
         assert_eq!(ip.next(), Some(3));
@@ -66,8 +66,8 @@ mod tests {
     }
 
     #[test]
-    fn inter_pack_test_02() {
-        let mut ip = unpack(1 + 2*3 +0*9 + 2*27 + 1*81, 3, 6);
+    fn integer_pack_test_02() {
+        let mut ip = unpack(1 + 2 * 3 + 0 * 9 + 2 * 27 + 1 * 81, 3, 6);
         assert_eq!(ip.next(), Some(1));
         assert_eq!(ip.next(), Some(2));
         assert_eq!(ip.next(), Some(0));

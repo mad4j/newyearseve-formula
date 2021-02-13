@@ -1,3 +1,5 @@
+use crate::postfix_to_infix::to_infix;
+
 use std::char;
 use std::fmt;
 
@@ -70,6 +72,11 @@ impl Formula {
             None
         }
     }
+
+    pub fn to_infix(&self) -> String {
+        let s = format!("{}", self);
+        to_infix(&s).unwrap()
+    }
 }
 
 impl fmt::Display for Formula {
@@ -92,7 +99,7 @@ impl fmt::Display for Formula {
                 buf.push(operators[o]);
                 o += 1;
             }
-            buf.push(' ');
+            //buf.push(' ');
         }
 
         write!(f, "{}", buf)
