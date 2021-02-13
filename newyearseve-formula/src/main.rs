@@ -94,27 +94,32 @@ fn main() {
         results.append(&mut r);
     }
 
-    // stop duration timer
+    // stop duration timer and get total results
     let duration = started.elapsed();
+    let solutions = results.len();
 
+    // sort results and remove duplicated if needed
     let mut results: Vec<String> = results.iter().map(|x| x.to_infix()).collect();
     results.sort_by_key(|x| x.len());
     results.dedup();
-    results.reverse();
 
-    // display detailed results
-    if opt.report {
-        for i in 0..results.len() {
-            //println!("{} : {} -> {}", i + 1, results[i], results[i].to_infix());
-            println!("{} : {}", i + 1, results[i]);
-        }
+    // filter results
+    if !opt.report {
+        let min = results.iter().map(|x| x.len()).min().unwrap_or_default();
+        results = results.into_iter().filter(|x| x.len() == min).collect();
     }
 
-    // display summary results (i.e. duration and speeds)
+    // display detailed results
+    println!();
+    for i in 0..results.len() {
+        println!("{} : {}", i + 1, results[i]);
+    }
+
+    // display summary results (i.e. duration and speed)
     println!();
     println!(
         "Found {} solutions in {} @{} iter per millis",
-        results.len().to_string().yellow().bold(),
+        solutions.to_string().yellow().bold(),
         HumanDuration(duration).to_string().green(),
         (MAX_ITERATIONS / duration.as_millis() as u64)
             .to_string()
