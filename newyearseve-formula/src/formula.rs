@@ -99,7 +99,6 @@ impl fmt::Display for Formula {
                 buf.push(operators[o]);
                 o += 1;
             }
-            //buf.push(' ');
         }
 
         write!(f, "{}", buf)

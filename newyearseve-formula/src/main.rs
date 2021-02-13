@@ -65,7 +65,7 @@ fn main() {
     let target = opt.target;
     let cores = opt.cores;
 
-    // initialize and start computeation cores
+    // initialize and start computation cores
     for i in 0..cores {
         //build a new progress bar
         let pb = multi_bar.add(ProgressBar::new(iterations));
@@ -111,6 +111,7 @@ fn main() {
 
     // display detailed results
     println!();
+    println!("{}", "Results:".green().bold());
     for i in 0..results.len() {
         println!("{} : {}", i + 1, results[i]);
     }
