@@ -9,6 +9,7 @@ mod postfix_to_infix;
 use crate::algorithm::{compute, MAX_ITERATIONS};
 use crate::formula::Formula;
 
+use evalexpr::eval_int;
 use structopt::StructOpt;
 
 use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressStyle};
@@ -100,7 +101,9 @@ fn main() {
 
     // sort results and remove duplicated if needed
     let mut results: Vec<String> = results.iter().map(|x| x.to_infix()).collect();
-    results.sort_by_key(|x| x.len());
+    //let mut results: Vec<String> = results.iter().map(|x| format!("'{}' - '{}' = {:?}", x.to_string(), x.to_infix(), eval_int(&x.to_infix()))).collect();
+    results.sort();
+    //results.sort_by_key(|x| x.len());
     results.dedup();
 
     // filter results
@@ -120,7 +123,7 @@ fn main() {
     println!();
     println!(
         "Found {} solutions in {} @{} iter per millis",
-        solutions.to_string().yellow().bold(),
+        results.len().to_string().yellow().bold(),
         HumanDuration(duration).to_string().green(),
         (MAX_ITERATIONS / duration.as_millis() as u64)
             .to_string()

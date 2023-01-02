@@ -53,7 +53,12 @@ impl Formula {
                     '+' => op1.checked_add(op2),
                     '-' => op1.checked_sub(op2),
                     '*' => op1.checked_mul(op2),
-                    '/' => op1.checked_div(op2),
+                    // works only if (op1%op2 == 0), otherwise discard
+                    '/' => match op1.checked_rem(op2) {
+                        Some(v) => if v == 0 { op1.checked_div(op2) } else { None },
+                        // occurs when op2 == 0 (i.e. pushed result from previous computattions)
+                        None => None,
+                    },
                     '^' => op1.checked_pow(op2 as u32),
                     _ => None,
                 };
@@ -89,7 +94,7 @@ impl fmt::Display for Formula {
         let mut o = 0;
         let mut d = 9;
 
-        let mut buf = String::with_capacity(2 * FORMULA_SIZE as usize);
+        let mut buf = String::with_capacity(FORMULA_SIZE as usize);
 
         for i in 0..FORMULA_SIZE {
             if i < positions[o] {
@@ -102,5 +107,20 @@ impl fmt::Display for Formula {
         }
 
         write!(f, "{}", buf)
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use crate::formula::Formula;
+
+    #[test]
+    fn it_works() {
+
+        let f = Formula::new(vec![2,4,6,8,10,12,14,16], vec!['+','+','+','+','+','+','+','+']);
+        println!("{}", f);
+        println!("{:?}", f.evaluate());
+        assert!(true);
     }
 }
