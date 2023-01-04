@@ -55,7 +55,13 @@ impl Formula {
                     '*' => op1.checked_mul(op2),
                     // works only if (op1%op2 == 0), otherwise discard
                     '/' => match op1.checked_rem(op2) {
-                        Some(v) => if v == 0 { op1.checked_div(op2) } else { None },
+                        Some(v) => {
+                            if v == 0 {
+                                op1.checked_div(op2)
+                            } else {
+                                None
+                            }
+                        }
                         // occurs when op2 == 0 (i.e. pushed result from previous computattions)
                         None => None,
                     },
@@ -110,15 +116,16 @@ impl fmt::Display for Formula {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::formula::Formula;
 
     #[test]
     fn it_works() {
-
-        let f = Formula::new(vec![2,4,6,8,10,12,14,16], vec!['+','+','+','+','+','+','+','+']);
+        let f = Formula::new(
+            vec![2, 4, 6, 8, 10, 12, 14, 16],
+            vec!['+', '+', '+', '+', '+', '+', '+', '+'],
+        );
         println!("{}", f);
         println!("{:?}", f.evaluate());
         assert!(true);

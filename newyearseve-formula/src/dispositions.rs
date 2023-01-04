@@ -1,4 +1,4 @@
-use crate::integer_pack::unpack;
+use intpackit::unpack;
 
 #[derive(Debug, Clone)]
 pub struct Dispositions<I: Iterator> {

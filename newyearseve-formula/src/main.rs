@@ -3,19 +3,17 @@
 mod algorithm;
 mod dispositions;
 mod formula;
-mod integer_pack;
 mod postfix_to_infix;
 
 use crate::algorithm::{compute, MAX_ITERATIONS};
 use crate::formula::Formula;
 
-use evalexpr::eval_int;
 use structopt::StructOpt;
 
 use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressStyle};
 
 use colored::Colorize;
-use std::thread;
+use std::thread::{self, available_parallelism};
 use std::time::Instant;
 
 #[derive(Debug, StructOpt)]
@@ -23,10 +21,12 @@ use std::time::Instant;
     name = "newyearseve",
     about = "looking for a New Year's Eve count down formula"
 )]
+
+/// Command line arguments
 struct Opt {
-    /// number of parallel cores
-    #[structopt(short, long, default_value = "1")]
-    cores: usize,
+    /// number of parallel jobs (0 will uses available cores)
+    #[structopt(short, long, default_value = "0")]
+    jobs: usize,
 
     /// target year
     #[structopt(short, long)]
@@ -41,12 +41,29 @@ fn main() {
     // parse command-line parameters
     let opt = Opt::from_args();
 
+    // retrives available cores
+    let available_cores = match available_parallelism() {
+        Ok(v) => v.into(),
+        Err(_) => 1,
+    };
+
+    // set cores to be used
+    let jobs = if opt.jobs == 0 {
+        available_cores
+    } else {
+        opt.jobs
+    };
+
     // display applicationn header
     println!();
     println!("{}", "New Year's Eve countdown formula".green().bold());
     println!();
     println!("target : {}", opt.target.to_string().yellow());
-    println!("cores  : {}", opt.cores.to_string().yellow());
+    println!(
+        "jobs   : {} on {} cores",
+        jobs.to_string().yellow(),
+        available_cores.to_string().yellow()
+    );
     println!("report : {}", opt.report.to_string().yellow());
     println!();
 
@@ -62,9 +79,9 @@ fn main() {
     let mut results = Vec::<Formula>::new();
     let mut handles = vec![];
 
-    let iterations = MAX_ITERATIONS / opt.cores as u64;
+    let iterations = MAX_ITERATIONS / jobs as u64;
     let target = opt.target;
-    let cores = opt.cores;
+    let cores = jobs;
 
     // initialize and start computation cores
     for i in 0..cores {
@@ -97,14 +114,20 @@ fn main() {
 
     // stop duration timer and get total results
     let duration = started.elapsed();
-    let solutions = results.len();
 
     // sort results and remove duplicated if needed
     let mut results: Vec<String> = results.iter().map(|x| x.to_infix()).collect();
     //let mut results: Vec<String> = results.iter().map(|x| format!("'{}' - '{}' = {:?}", x.to_string(), x.to_infix(), eval_int(&x.to_infix()))).collect();
+
+    // remove duplicate solutions
     results.sort();
-    //results.sort_by_key(|x| x.len());
     results.dedup();
+
+    // sort by solution length (shorter first)
+    results.sort_by_key(|x| x.len());
+
+    // solutions found
+    let solutions = results.len();
 
     // filter results
     if !opt.report {
@@ -123,7 +146,7 @@ fn main() {
     println!();
     println!(
         "Found {} solutions in {} @{} iter per millis",
-        results.len().to_string().yellow().bold(),
+        solutions.to_string().yellow().bold(),
         HumanDuration(duration).to_string().green(),
         (MAX_ITERATIONS / duration.as_millis() as u64)
             .to_string()

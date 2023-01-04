@@ -63,7 +63,7 @@ where
             let a = op_right_assoc(c);
 
             //let tr = if r.prec < p {
-            let tr = if r.prec < p || (!a && !op_assoc(c) && r.prec == p) {    
+            let tr = if r.prec < p || (!a && !op_assoc(c) && r.prec == p) {
                 format!("({})", r.value)
             } else {
                 r.value
@@ -116,32 +116,24 @@ mod tests {
         assert_eq!(to_infix("987++"), Some(String::from("9+8+7")));
         assert_eq!(to_infix("98+7^"), Some(String::from("(9+8)^7")));
     }
-    
-        #[test]
-        fn postfix_to_infix_test_03() {
-            println!("{:?}", evalexpr::eval_int("9*8"));
-            println!("{:?}", evalexpr::eval_int("9*8+7+6"));
-            println!("{:?}", evalexpr::eval_int("9*8+7+6^5"));
-            println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4"));
-            println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3"));
-            println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3+2"));
-            println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3+2+1"));
 
-            println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3+2+1"));
-            assert!(true);
-        }
+    #[test]
+    fn postfix_to_infix_test_03() {
+        println!("{:?}", evalexpr::eval_int("9*8"));
+        println!("{:?}", evalexpr::eval_int("9*8+7+6"));
+        println!("{:?}", evalexpr::eval_int("9*8+7+6^5"));
+        println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4"));
+        println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3"));
+        println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3+2"));
+        println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3+2+1"));
 
-        #[test]
-        fn postfix_to_infix_test_04() {
-            assert_eq!(
-                to_infix("72-1-"),
-                Some(String::from("7-2-1"))
-            );
-            assert_eq!(
-                to_infix("721--"),
-                Some(String::from("7-(2-1)"))
-            );
-            
-        }
-    
+        println!("{:?}", evalexpr::eval_int("9*8+7+6^5/4-3+2+1"));
+        assert!(true);
+    }
+
+    #[test]
+    fn postfix_to_infix_test_04() {
+        assert_eq!(to_infix("72-1-"), Some(String::from("7-2-1")));
+        assert_eq!(to_infix("721--"), Some(String::from("7-(2-1)")));
+    }
 }
