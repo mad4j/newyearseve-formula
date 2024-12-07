@@ -61,7 +61,7 @@ Found 547 solutions in 1 minute @8419 iter per millis
 
 ### 2024
 ```
-*8+7+6^5/4+3-2*1
+9*8+7+6^5/4+3-2*1
 ```
 
 ### 2023
