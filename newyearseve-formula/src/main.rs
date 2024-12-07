@@ -10,7 +10,7 @@ use crate::formula::Formula;
 
 use structopt::StructOpt;
 
-use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressStyle};
+use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressDrawTarget, ProgressStyle};
 
 use colored::Colorize;
 use std::thread::{self, available_parallelism};
@@ -71,7 +71,11 @@ fn main() {
     let multi_bar = MultiProgress::new();
     let bar_style = ProgressStyle::default_bar()
         .template("[{elapsed_precise}] {bar:40.cyan/blue} {percent:>3}% ({eta}) {msg}")
+        .unwrap()
         .progress_chars("#--");
+
+    // avoid console bottleneck
+    ProgressDrawTarget::stderr_with_hz(1);
 
     // start timer
     let started = Instant::now();
@@ -87,7 +91,6 @@ fn main() {
     for i in 0..cores {
         //build a new progress bar
         let pb = multi_bar.add(ProgressBar::new(iterations));
-        pb.set_draw_delta(iterations / 100);
         pb.set_style(bar_style.clone());
 
         // start requested cores
@@ -104,7 +107,7 @@ fn main() {
     }
 
     // waits for all progress bars to report that they are finished.
-    multi_bar.join().unwrap();
+    //multi_bar.join().unwrap()
 
     // collect results
     for h in handles {

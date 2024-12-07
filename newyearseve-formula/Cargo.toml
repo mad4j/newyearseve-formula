@@ -8,8 +8,8 @@ edition = "2018"
 
 [dependencies]
 intpackit = "0.1"
-colored = "2.0"
-indicatif = "0.15"
-itertools = "0.10"
+colored = "2.1.0"
+indicatif = "0.17.9"
+itertools = "0.13.0"
 structopt = "0.3"
-evalexpr = "8.1"
+evalexpr = "12.0.1"
