@@ -21,6 +21,7 @@ fn op_prec(c: char) -> u8 {
         '+' | '-' => 1,
         '/' | '*' => 2,
         '^' => 3,
+        '&' => 4,
         '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => 10,
         _ => 0,
     }
@@ -29,7 +30,7 @@ fn op_prec(c: char) -> u8 {
 fn op_right_assoc(c: char) -> bool {
     match c {
         '^' => true,
-        '+' | '-' | '*' | '/' => false,
+        '+' | '-' | '*' | '/' | '&' => false,
         _ => false,
     }
 }
@@ -43,7 +44,7 @@ fn op_assoc(c: char) -> bool {
 
 fn is_operator(c: char) -> bool {
     match c {
-        '+' | '-' | '/' | '*' | '^' => true,
+        '+' | '-' | '/' | '*' | '^' | '&' => true,
         _ => false,
     }
 }
@@ -75,7 +76,14 @@ where
                 l.value
             };
 
-            stack.push(Exp::new(format!("{}{}{}", tl, c, tr), p));
+            // concatenation operator is invisible in output
+            let result = if c == '&' {
+                format!("{}{}", tl, tr)
+            } else {
+                format!("{}{}{}", tl, c, tr)
+            };
+
+            stack.push(Exp::new(result, p));
         } else {
             stack.push(Exp::new(c.to_string(), op_prec(c)));
         }
