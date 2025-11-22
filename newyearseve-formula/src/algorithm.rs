@@ -3,34 +3,58 @@ use crate::formula::{Formula, FORMULA_NUM_OPERATORS, FORMULA_OPERATORS, FORMULA_
 
 use indicatif::ProgressBar;
 use itertools::Itertools;
+use rayon::prelude::*;
+use std::sync::atomic::{AtomicU64, Ordering};
 
-// computed out of the box
-pub const MAX_ITERATIONS: u64 = 558_593_750;
-
-pub fn compute(target: i64, part: usize, parts: usize, progress_bar: &ProgressBar) -> Vec<Formula> {
+pub fn compute(target: i64, progress_bar: &ProgressBar) -> Vec<Formula> {
     // generate all valid operator's positions
-    let pos = (0..FORMULA_SIZE)
+    let positions: Vec<Vec<u8>> = (0..FORMULA_SIZE)
         .combinations(FORMULA_NUM_OPERATORS as usize)
-        .filter(|x| Formula::is_valid(x));
-
-    // generate all possible operators dispositions
-    let ops = FORMULA_OPERATORS.iter().cloned().dispositions_part(
-        FORMULA_NUM_OPERATORS as usize,
-        part as u8,
-        parts as u8,
-    );
-
-    // looking for formula that compute a specific value
-    let result: Vec<Formula> = pos
-        .cartesian_product(ops)
-        .inspect(|_| progress_bar.inc(1))
-        .map(|(p, o)| Formula::new(p, o))
-        .filter(|f| f.evaluate() == Some(target))
+        .filter(|x| Formula::is_valid(x))
         .collect();
 
-    // dispose progress bar
-    progress_bar.finish_with_message("done");
+    // generate all possible operators dispositions
+    let operators: Vec<Vec<char>> = FORMULA_OPERATORS
+        .iter()
+        .cloned()
+        .dispositions(FORMULA_NUM_OPERATORS as usize)
+        .collect();
 
-    // return result
+    let total_combinations = positions.len() * operators.len();
+    progress_bar.set_length(total_combinations as u64);
+
+    // counter for progress tracking
+    let counter = AtomicU64::new(0);
+    
+    // looking for formula that compute a specific value using Rayon
+    let result: Vec<Formula> = positions
+        .into_par_iter()
+        .map(|pos| {
+            operators
+                .par_iter()
+                .filter_map(|ops| {
+                    let formula = Formula::new(pos.clone(), ops.clone());
+                    let current = counter.fetch_add(1, Ordering::Relaxed);
+                    
+                    // Update progress every 10000 iterations to avoid overhead
+                    if current % 10000 == 0 {
+                        progress_bar.set_position(current);
+                    }
+                    
+                    if formula.evaluate() == Some(target) {
+                        Some(formula)
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<Formula>>()
+        })
+        .flatten()
+        .collect();
+
+    // finish progress bar
+    progress_bar.set_position(total_combinations as u64);
+    progress_bar.finish_with_message("Complete");
+
     result
 }

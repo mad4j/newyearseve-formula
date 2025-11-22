@@ -79,6 +79,7 @@ pub fn dispositions_part<I: Iterator>(iter: I, k: usize, part: u8, parts: u8) ->
 
 pub trait DispositionsTrait: Sized + Iterator {
     fn dispositions(self, k: usize) -> Dispositions<Self>;
+    #[allow(dead_code)]
     fn dispositions_part(self, k: usize, part: u8, parts: u8) -> Dispositions<Self>;
 }
 
