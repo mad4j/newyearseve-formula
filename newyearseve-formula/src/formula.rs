@@ -7,7 +7,7 @@ pub const FORMULA_NUM_OPERANDS: u8 = 9;
 pub const FORMULA_NUM_OPERATORS: u8 = 8;
 pub const FORMULA_SIZE: u8 = FORMULA_NUM_OPERANDS + FORMULA_NUM_OPERATORS;
 
-pub const FORMULA_OPERATORS: [char; 6] = ['+', '-', '*', '/', '^', '&'];
+pub const FORMULA_OPERATORS: [char; 7] = ['+', '-', '*', '/', '^', '&', '%'];
 
 #[derive(Debug)]
 pub struct Formula {
@@ -76,6 +76,8 @@ impl Formula {
                             None
                         }
                     },
+                    // modulo: returns remainder of division
+                    '%' => op1_val.checked_rem(op2_val),
                     _ => None,
                 };
 

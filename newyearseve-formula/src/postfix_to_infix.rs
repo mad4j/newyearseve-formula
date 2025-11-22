@@ -19,7 +19,7 @@ impl Exp {
 fn op_prec(c: char) -> u8 {
     match c {
         '+' | '-' => 1,
-        '/' | '*' => 2,
+        '/' | '*' | '%' => 2,
         '^' => 3,
         '&' => 4,
         '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => 10,
@@ -30,7 +30,7 @@ fn op_prec(c: char) -> u8 {
 fn op_right_assoc(c: char) -> bool {
     match c {
         '^' => true,
-        '+' | '-' | '*' | '/' | '&' => false,
+        '+' | '-' | '*' | '/' | '&' | '%' => false,
         _ => false,
     }
 }
@@ -44,7 +44,7 @@ fn op_assoc(c: char) -> bool {
 
 fn is_operator(c: char) -> bool {
     match c {
-        '+' | '-' | '/' | '*' | '^' | '&' => true,
+        '+' | '-' | '/' | '*' | '^' | '&' | '%' => true,
         _ => false,
     }
 }
