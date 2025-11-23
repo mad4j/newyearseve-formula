@@ -6,15 +6,22 @@ use itertools::Itertools;
 use rayon::prelude::*;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-pub fn compute(target: i64, progress_bar: &ProgressBar) -> Vec<Formula> {
+pub fn compute(target: i64, progress_bar: &ProgressBar, simple_ops: bool) -> Vec<Formula> {
     // generate all valid operator's positions
     let positions: Vec<Vec<u8>> = (0..FORMULA_SIZE)
         .combinations(FORMULA_NUM_OPERATORS as usize)
         .filter(|x| Formula::is_valid(x))
         .collect();
 
+    // select operators based on simple_ops flag
+    let available_operators: Vec<char> = if simple_ops {
+        vec!['+', '-', '*']
+    } else {
+        FORMULA_OPERATORS.to_vec()
+    };
+
     // generate all possible operators dispositions
-    let operators: Vec<Vec<char>> = FORMULA_OPERATORS
+    let operators: Vec<Vec<char>> = available_operators
         .iter()
         .cloned()
         .dispositions(FORMULA_NUM_OPERATORS as usize)

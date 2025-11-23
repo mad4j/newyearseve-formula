@@ -32,6 +32,10 @@ struct Opt {
     /// output detailed results
     #[arg(short, long)]
     report: bool,
+
+    /// use only simple operations (+, -, *)
+    #[arg(short = 's', long)]
+    simple_ops: bool,
 }
 
 fn main() {
@@ -59,6 +63,7 @@ fn main() {
         jobs.to_string().yellow()
     );
     println!("report : {}", opt.report.to_string().yellow());
+    println!("simple ops: {}", opt.simple_ops.to_string().yellow());
     println!();
 
     // setup progress bar
@@ -74,7 +79,7 @@ fn main() {
     let started = Instant::now();
 
     // compute results using Rayon for parallel processing
-    let results = compute(opt.target, &pb);
+    let results = compute(opt.target, &pb, opt.simple_ops);
 
     // stop progress bar
     pb.finish_with_message("Computation complete");
