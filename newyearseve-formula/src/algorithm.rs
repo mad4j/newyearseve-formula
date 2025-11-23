@@ -6,7 +6,7 @@ use itertools::Itertools;
 use rayon::prelude::*;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-pub fn compute(target: i64, progress_bar: &ProgressBar, simple_ops: bool) -> Vec<Formula> {
+pub fn compute(target: i64, progress_bar: &ProgressBar, simple_ops: bool, no_parentheses: bool) -> Vec<Formula> {
     // generate all valid operator's positions
     let positions: Vec<Vec<u8>> = (0..FORMULA_SIZE)
         .combinations(FORMULA_NUM_OPERATORS as usize)
@@ -49,7 +49,17 @@ pub fn compute(target: i64, progress_bar: &ProgressBar, simple_ops: bool) -> Vec
                     }
                     
                     if formula.evaluate() == Some(target) {
-                        Some(formula)
+                        // Se no_parentheses è attivo, escludi formule con parentesi
+                        if no_parentheses {
+                            let infix = formula.to_infix();
+                            if infix.contains('(') || infix.contains(')') {
+                                None
+                            } else {
+                                Some(formula)
+                            }
+                        } else {
+                            Some(formula)
+                        }
                     } else {
                         None
                     }

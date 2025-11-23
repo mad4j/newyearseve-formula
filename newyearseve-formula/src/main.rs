@@ -36,6 +36,10 @@ struct Opt {
     /// use only simple operations (+, -, *)
     #[arg(short = 's', long)]
     simple_ops: bool,
+
+    /// exclude formulas with parentheses from results
+    #[arg(short = 'n', long)]
+    no_parentheses: bool,
 }
 
 fn main() {
@@ -79,7 +83,7 @@ fn main() {
     let started = Instant::now();
 
     // compute results using Rayon for parallel processing
-    let results = compute(opt.target, &pb, opt.simple_ops);
+    let results = compute(opt.target, &pb, opt.simple_ops, opt.no_parentheses);
 
     // stop progress bar
     pb.finish_with_message("Computation complete");
